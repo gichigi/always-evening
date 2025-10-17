@@ -1,6 +1,6 @@
 // API endpoint for serving audio files
 import { NextRequest, NextResponse } from 'next/server';
-import { getEpisodeDir } from '@/lib/cleanup';
+import { getEpisodeDirWithFallback } from '@/lib/cleanup';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -35,16 +35,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get file path
-    const episodeDir = getEpisodeDir(episodeId);
+    // Get file path with fallback for serverless environments
+    const episodeDir = await getEpisodeDirWithFallback(episodeId);
     const filepath = path.join(episodeDir, name);
 
     // Check if file exists
     try {
       await fs.access(filepath);
-    } catch {
+    } catch (error: any) {
+      console.error(`File not found: ${filepath}`, error.message);
+      
+      // Also check if episode directory exists for debugging
+      try {
+        await fs.access(episodeDir);
+        console.log(`Episode directory exists: ${episodeDir}`);
+        
+        // List files in directory for debugging
+        const files = await fs.readdir(episodeDir);
+        console.log(`Files in episode directory:`, files);
+      } catch (dirError: any) {
+        console.error(`Episode directory not found: ${episodeDir}`, dirError.message);
+      }
+      
       return NextResponse.json(
-        { error: 'File not found' },
+        { 
+          error: 'File not found', 
+          hint: `Audio file ${name} not found for episode ${episodeId}. Make sure TTS generation completed successfully.`,
+          debug: {
+            episodeDir,
+            filepath,
+            episodeId,
+            name
+          }
+        },
         { status: 404 }
       );
     }

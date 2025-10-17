@@ -1,6 +1,6 @@
 // API endpoint for packaging episode as ZIP
 import { NextRequest, NextResponse } from 'next/server';
-import { getEpisodeDir } from '@/lib/cleanup';
+import { getEpisodeDirWithFallback } from '@/lib/cleanup';
 import archiver from 'archiver';
 import fs from 'fs';
 import path from 'path';
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const episodeDir = getEpisodeDir(episodeId);
+    const episodeDir = await getEpisodeDirWithFallback(episodeId);
 
     // Check if directory exists
     if (!fs.existsSync(episodeDir)) {

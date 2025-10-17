@@ -51,6 +51,20 @@ export function getEpisodeDir(episodeId: string): string {
   return path.join(CACHE_DIR, episodeId);
 }
 
+// Get episode directory path with fallback logic for serverless environments
+export async function getEpisodeDirWithFallback(episodeId: string): Promise<string> {
+  const cacheDir = path.join(CACHE_DIR, episodeId);
+  
+  try {
+    // Check if cache directory is accessible
+    await fs.access(CACHE_DIR);
+    return cacheDir;
+  } catch {
+    // Fallback to /tmp directory
+    return path.join('/tmp', 'always-evening', episodeId);
+  }
+}
+
 // Create episode directory
 export async function createEpisodeDir(episodeId: string): Promise<string> {
   const episodeDir = getEpisodeDir(episodeId);
