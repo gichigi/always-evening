@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     const fileBuffer = await fs.readFile(filepath);
 
     // Return audio file with correct headers
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(fileBuffer as any, {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': fileBuffer.length.toString(),

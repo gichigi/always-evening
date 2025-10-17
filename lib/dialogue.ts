@@ -17,7 +17,7 @@ const CHARACTERS = {
 // Generate AI response for a character
 async function generateResponse(
   speaker: Speaker,
-  conversationHistory: Array<{ role: string; content: string }>,
+  conversationHistory: Array<{ role: "assistant" | "user"; content: string }>,
   theme: string
 ): Promise<string> {
   const character = CHARACTERS[speaker];
@@ -52,7 +52,7 @@ async function generateResponse(
 // Generate complete dialogue for an episode
 export async function generateDialogue(theme: string, turns: number = 10): Promise<Line[]> {
   const lines: Line[] = [];
-  const conversationHistory: Array<{ role: string; content: string }> = [];
+  const conversationHistory: Array<{ role: "assistant" | "user"; content: string }> = [];
   
   // Start with Isaac introducing the theme
   const intro = `Let's talk about something that's been on my mind lately. ${theme.toLowerCase()}`;
