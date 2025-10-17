@@ -1,0 +1,32 @@
+{
+  "name": "always-evening",
+  "version": "1.0.0",
+  "description": "A podcast-style dialogue simulator between two AI hosts exploring human meaning",
+  "main": "index.js",
+  "scripts": {
+    "cli": "node index.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "openai": "^4.20.1",
+    "dotenv": "^16.3.1",
+    "next": "^14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "nanoid": "^5.0.4",
+    "archiver": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.18",
+    "@types/archiver": "^6.0.2",
+    "typescript": "^5.3.3"
+  },
+  "keywords": ["podcast", "dialogue", "ai", "meaning", "philosophy"],
+  "author": "",
+  "license": "MIT"
+}
