@@ -28,7 +28,7 @@ A podcast-style dialogue simulator featuring two AI hosts — Lena and Isaac —
 - Dry humor and grounded perspective
 - Envies human capacity for belief
 
-## Setup
+## The Setup
 
 1. **Install dependencies**:
    ```bash
