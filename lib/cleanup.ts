@@ -8,15 +8,28 @@ const MAX_AGE_MS = 2 * 60 * 60 * 1000; // 2 hours
 // Clean up episode folders older than 2 hours
 export async function cleanupOldEpisodes(): Promise<void> {
   try {
-    // Ensure cache directory exists
-    await fs.mkdir(CACHE_DIR, { recursive: true });
+    let cleanupDir = CACHE_DIR;
     
-    const entries = await fs.readdir(CACHE_DIR, { withFileTypes: true });
+    try {
+      // Ensure cache directory exists
+      await fs.mkdir(CACHE_DIR, { recursive: true });
+    } catch (error: any) {
+      // If cache dir creation fails, try /tmp fallback
+      if (error.code === 'ENOENT' || error.code === 'EACCES') {
+        console.warn('Cache directory access failed, using /tmp for cleanup:', error.message);
+        cleanupDir = path.join('/tmp', 'always-evening');
+        await fs.mkdir(cleanupDir, { recursive: true });
+      } else {
+        throw error;
+      }
+    }
+    
+    const entries = await fs.readdir(cleanupDir, { withFileTypes: true });
     const now = Date.now();
     
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        const episodePath = path.join(CACHE_DIR, entry.name);
+        const episodePath = path.join(cleanupDir, entry.name);
         const stats = await fs.stat(episodePath);
         const age = now - stats.mtimeMs;
         
@@ -41,7 +54,20 @@ export function getEpisodeDir(episodeId: string): string {
 // Create episode directory
 export async function createEpisodeDir(episodeId: string): Promise<string> {
   const episodeDir = getEpisodeDir(episodeId);
-  await fs.mkdir(episodeDir, { recursive: true });
+  
+  try {
+    await fs.mkdir(episodeDir, { recursive: true });
+  } catch (error: any) {
+    // If mkdir fails, try using /tmp as fallback in serverless environments
+    if (error.code === 'ENOENT' || error.code === 'EACCES') {
+      console.warn('Cache directory creation failed, using /tmp fallback:', error.message);
+      const tmpDir = path.join('/tmp', 'always-evening', episodeId);
+      await fs.mkdir(tmpDir, { recursive: true });
+      return tmpDir;
+    }
+    throw error;
+  }
+  
   return episodeDir;
 }
 
